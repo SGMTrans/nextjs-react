@@ -33,12 +33,13 @@ export default function EditPost() {
         return res.json();
       })
       .then((data) => {
-        if (data.posts && Array.isArray(data.posts) && data.posts.length > 0) {
-          setTitle(data.posts[0].title || "");
-          setContent(data.posts[0].content || "");
-          setImage(data.posts[0].image || "");
+        console.log("Post data:", data); // Debugging: see what data is returned
+        if (data.post) {
+          setTitle(data.post.title || "");
+          setContent(data.post.content || "");
+          setImage(data.post.image || "");
         } else {
-          console.error("Unexpected data format:", data);
+          console.error("Post data not found.");
         }
       })
       .catch((error) => console.error("Error fetching post:", error));
@@ -51,6 +52,9 @@ export default function EditPost() {
       return;
     }
 
+    const postData = { title, content, image };
+    console.log("Sending data:", postData); // Debugging: check data being sent
+
     try {
       const response = await fetch(`/api/posts/${id}`, {
         method: "PUT",
@@ -58,7 +62,7 @@ export default function EditPost() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ title, content }),
+        body: JSON.stringify(postData),
       });
 
       if (response.status === 401) {
@@ -98,13 +102,13 @@ export default function EditPost() {
             />
           </div>
           <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-2">
-              Title
+            <label htmlFor="image" className="block text-sm font-medium mb-2">
+              Image URL
             </label>
             <input
               type="text"
               id="image"
-              placeholder="Enter post url image"
+              placeholder="Enter post image URL"
               value={image}
               onChange={(e) => setImage(e.target.value)}
               className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
